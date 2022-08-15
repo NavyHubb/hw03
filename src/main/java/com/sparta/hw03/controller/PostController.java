@@ -33,6 +33,12 @@ public class PostController {
         return postRepository.findById(id);
     }
 
+    @PutMapping("/api/post/{id}")
+    public PostRequestDto updateMemo(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
+        postService.update(id, requestDto);
+        return requestDto;
+    }
+
     @DeleteMapping("/api/post/{id}")
     public Long deletePost(@PathVariable Long id) {
         postRepository.deleteById(id);
