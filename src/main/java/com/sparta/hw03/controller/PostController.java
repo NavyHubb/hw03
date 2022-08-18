@@ -1,5 +1,6 @@
 package com.sparta.hw03.controller;
 
+import com.sparta.hw03.dto.PostPasswordDto;
 import com.sparta.hw03.dto.PostResponseDto;
 import com.sparta.hw03.entity.Post;
 import com.sparta.hw03.repository.PostRepository;
@@ -17,12 +18,6 @@ public class PostController {
 
     private final PostRepository postRepository;
     private final PostService postService;
-
-
-//    @GetMapping("/api/posts")
-//    public List<Post> readPost() {
-//        return postRepository.findAllByOrderByIdDesc();
-//    }
 
     @GetMapping("/api/posts")
     public List<PostResponseDto> readPost() {
@@ -50,6 +45,13 @@ public class PostController {
         return postService.response(post);
     }
 
+    @PostMapping("api/posts/{id}")
+    public boolean checkPassword(@PathVariable Long id, @RequestBody PostPasswordDto passwordDto) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("보여달라고? 그런 아이디 없는디?")
+        );
+        return post.getPassword().equals(passwordDto.getPassword());
+    }
 
     @PutMapping("/api/posts/{id}")
     public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
@@ -60,11 +62,10 @@ public class PostController {
         return postService.response(post);
     }
 
-
     @DeleteMapping("/api/posts/{id}")
     public boolean deletePost(@PathVariable Long id) {
         postRepository.deleteById(id);
-        return true;  // 이렇게 하는 거 맞나..??
+        return true;
     }
 
 }

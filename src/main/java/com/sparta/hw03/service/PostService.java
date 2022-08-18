@@ -34,5 +34,4 @@ public class PostService {
 
         return responseDto;
     }
-
 }
