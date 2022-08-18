@@ -1,5 +1,6 @@
 package com.sparta.hw03.service;
 
+import com.sparta.hw03.dto.PostResponseDto;
 import com.sparta.hw03.entity.Post;
 import com.sparta.hw03.repository.PostRepository;
 import com.sparta.hw03.dto.PostRequestDto;
@@ -20,6 +21,18 @@ public class PostService {
         );
         post.update(requestDto);
         return post.getId();
+    }
+
+    public PostResponseDto response(Post post) {
+        PostResponseDto responseDto = new PostResponseDto();
+        responseDto.setCreatedAt(post.getCreatedAt());
+        responseDto.setModifiedAt(post.getModifiedAt());
+        responseDto.setId(post.getId());
+        responseDto.setTitle(post.getTitle());
+        responseDto.setContent(post.getContent());
+        responseDto.setAuthor(post.getAuthor());
+
+        return responseDto;
     }
 
 }

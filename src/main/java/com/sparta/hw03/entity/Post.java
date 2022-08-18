@@ -1,6 +1,5 @@
 package com.sparta.hw03.entity;
 
-import com.sparta.hw03.dto.OpenDto;
 import com.sparta.hw03.dto.PostRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,8 +42,6 @@ public class Post extends Timestamped { // 생성,수정 시간을 자동으로 
         this.author = requestDto.getAuthor();
         this.password = requestDto.getPassword();
     }
-
-
 
     public void update(PostRequestDto requestDto){
         this.title = requestDto.getTitle();
