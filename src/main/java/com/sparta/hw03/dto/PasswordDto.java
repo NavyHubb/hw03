@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PostPasswordDto {
+public class PasswordDto {
     private String password;
 }

@@ -1,71 +1,47 @@
 package com.sparta.hw03.controller;
 
-import com.sparta.hw03.dto.PostPasswordDto;
-import com.sparta.hw03.dto.PostResponseDto;
-import com.sparta.hw03.entity.Post;
-import com.sparta.hw03.repository.PostRepository;
+import com.sparta.hw03.dto.PasswordDto;
+import com.sparta.hw03.dto.ResponseDto;
 import com.sparta.hw03.dto.PostRequestDto;
 import com.sparta.hw03.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 public class PostController {
 
-    private final PostRepository postRepository;
     private final PostService postService;
 
-    @GetMapping("/api/posts")
-    public List<PostResponseDto> readPost() {
-        List<Post> postList = postRepository.findAllByOrderByIdDesc();
-        List<PostResponseDto> responseDtoList = new ArrayList<>();
-        for (Post temp : postList) {
-            PostResponseDto responseDto = postService.response(temp);
-            responseDtoList.add(responseDto);
-        }
-        return responseDtoList;
+    @PostMapping("/api/post")
+    public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto) {
+        return postService.createPost(requestDto);
     }
 
-    @GetMapping("/api/posts/{id}")
-    public PostResponseDto readPostById(@PathVariable Long id) {
-        Post post = postRepository.findById(id).orElseThrow(  // 수정을 하려면 일단 찾아야겠지 findById
-                () -> new IllegalArgumentException("보여달라고? 그런 아이디 없는디?")
-        );
-        return postService.response(post);
+    @GetMapping("/api/post/{id}")
+    public ResponseDto<?> getPost(@PathVariable Long id) {
+        return postService.getPost(id);
     }
 
-    @PostMapping("/api/posts")
-    public PostResponseDto createPost(@RequestBody PostRequestDto requestDto) {
-        Post post = new Post(requestDto);
-        postRepository.save(post);
-        return postService.response(post);
+    @GetMapping("/api/post")
+    public ResponseDto<?> getAllPosts() {
+        return postService.getAllPost();
     }
 
-    @PostMapping("api/posts/{id}")
-    public boolean checkPassword(@PathVariable Long id, @RequestBody PostPasswordDto passwordDto) {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("보여달라고? 그런 아이디 없는디?")
-        );
-        return post.getPassword().equals(passwordDto.getPassword());
+    @PutMapping("/api/post/{id}")
+    public ResponseDto<?> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto) {
+        return postService.updatePost(id, postRequestDto);
     }
 
-    @PutMapping("/api/posts/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
-        postService.update(id, requestDto);
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("보여달라고? 그런 아이디 없는디?")
-        );
-        return postService.response(post);
+    @DeleteMapping("/api/post/{id}")
+    public ResponseDto<?> deletePost(@PathVariable Long id) {
+        return postService.deletePost(id);
     }
 
-    @DeleteMapping("/api/posts/{id}")
-    public boolean deletePost(@PathVariable Long id) {
-        postRepository.deleteById(id);
-        return true;
+    @PostMapping("/api/post/{id}")
+    public ResponseDto<?> validateAuthorByPassword(@PathVariable Long id, @RequestBody PasswordDto password) {
+        return postService.validateAuthorByPassword(id, password);
     }
 
 }

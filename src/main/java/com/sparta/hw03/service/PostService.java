@@ -1,6 +1,7 @@
 package com.sparta.hw03.service;
 
-import com.sparta.hw03.dto.PostResponseDto;
+import com.sparta.hw03.dto.PasswordDto;
+import com.sparta.hw03.dto.ResponseDto;
 import com.sparta.hw03.entity.Post;
 import com.sparta.hw03.repository.PostRepository;
 import com.sparta.hw03.dto.PostRequestDto;
@@ -8,30 +9,81 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class PostService {
-    private final PostRepository PostRepository;  //이걸 dto로 만들어서 controller로
+    private final PostRepository postRepository;  //이걸 dto로 만들어서 controller로
 
     @Transactional
-    public Long update(Long id, PostRequestDto requestDto) {
-        Post post = PostRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
-        );
+    public ResponseDto<?> createPost(PostRequestDto requestDto) {
+
+        Post post = new Post(requestDto);
+        postRepository.save(post);
+        return ResponseDto.success(post);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ResponseDto<?> getPost(Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (optionalPost.isEmpty()) {
+            return ResponseDto.fail("NULL_POST_ID", "post id isn't exist");
+        }
+
+        return ResponseDto.success(optionalPost.get());
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ResponseDto<?> getAllPost() {
+        return ResponseDto.success(postRepository.findAllByOrderByModifiedAtDesc());
+    }
+
+    @Transactional
+    public ResponseDto<Post> updatePost(Long id, PostRequestDto requestDto) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (optionalPost.isEmpty()) {
+            return ResponseDto.fail("NULL_POST_ID", "post id isn't exist");
+        }
+
+        Post post = optionalPost.get();
         post.update(requestDto);
-        return post.getId();
+
+        return ResponseDto.success(post);
     }
 
-    public PostResponseDto response(Post post) {
-        PostResponseDto responseDto = new PostResponseDto();
-        responseDto.setCreatedAt(post.getCreatedAt());
-        responseDto.setModifiedAt(post.getModifiedAt());
-        responseDto.setId(post.getId());
-        responseDto.setTitle(post.getTitle());
-        responseDto.setContent(post.getContent());
-        responseDto.setAuthor(post.getAuthor());
+    @Transactional
+    public ResponseDto<?> deletePost(Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
 
-        return responseDto;
+        if (optionalPost.isEmpty()) {
+            return ResponseDto.fail("NOT_FOUND", "post id is not exist");
+        }
+
+        Post post = optionalPost.get();
+
+        postRepository.delete(post);
+
+        return ResponseDto.success(true);
     }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ResponseDto<?> validateAuthorByPassword(Long id, PasswordDto password) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+
+        if (optionalPost.isEmpty()) {
+            return ResponseDto.fail("NOT_FOUND", "post id is not exist");
+        }
+
+        Post post = optionalPost.get();
+
+        if (!post.getPassword().equals(password.getPassword())) {
+            return ResponseDto.fail("PASSWORD_NOT_CORRECT", "password is not correct");
+        }
+
+        return ResponseDto.success(true);
+    }
+
 }

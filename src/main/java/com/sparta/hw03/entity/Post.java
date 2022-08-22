@@ -1,5 +1,6 @@
 package com.sparta.hw03.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.hw03.dto.PostRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,15 +27,10 @@ public class Post extends Timestamped { // 생성,수정 시간을 자동으로 
     @Column(nullable = false)
     private String author;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
-    public Post(String title, String content, String author, String password) {
-        this.title = title;
-        this.content = content;
-        this.author = author;
-        this.password = password;
-    }
 
     public Post(PostRequestDto requestDto) {
         this.title = requestDto.getTitle();
